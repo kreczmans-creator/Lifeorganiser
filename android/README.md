@@ -1,4 +1,4 @@
-# Life Organiser for Android
+# Juno for Android
 
 The vault in your pocket. Same markdown files, same folder layout — capture,
 tick, edit and review on the phone, then sync to GitHub so Claude Code and
@@ -12,7 +12,7 @@ attaches it to a rolling release:
 **https://github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest**
 
 1. Open that page **on your phone**.
-2. Tap `life-organiser.apk`.
+2. Tap `juno.apk`.
 3. Android will ask to allow installs from your browser — allow it, then
    install.
 

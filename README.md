@@ -1,4 +1,4 @@
-# Life Organiser — A Claude-Powered Life System
+# ✦ Juno — A Claude-Powered Life System
 
 A personal life management system built from plain markdown files. It works in
 **Claude Code** (via slash commands), in **Obsidian** (as a vault), and on
@@ -7,7 +7,7 @@ No plugins, no subscription, no lock-in. Everything is a text file you own.
 
 ## 📱 On your phone
 
-Install the Android app from the rolling release — open this on the handset
+Install the Juno Android app from the rolling release — open this on the handset
 and tap the APK:
 
 **[github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest](https://github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest)**

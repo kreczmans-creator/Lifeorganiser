@@ -1,5 +1,5 @@
 /*
- * Life Organiser — the whole UI.
+ * Juno — the whole UI.
  *
  * Every view reads from and writes to markdown in the vault. There is no
  * database and no separate model: what you see is what the files say, which is
@@ -653,9 +653,15 @@ const App = (function () {
 
   // ---- views ------------------------------------------------------------
 
-  function header(title, sub, actions) {
+  // The Juno mark: star follows the text colour, the dot stays sage.
+  var JUNO_LOCKUP =
+    '<svg class="mark" viewBox="0 0 64 64" aria-hidden="true">' +
+    '<path d="M32 8l5 19 19 5-19 5-5 19-5-19-19-5 19-5z" fill="currentColor"></path>' +
+    '<circle cx="51" cy="13" r="5" fill="var(--sage)"></circle></svg>Juno';
+
+  function header(title, sub, actions, rawTitle) {
     return '<header class="top"><div class="row"><div style="min-width:0">' +
-      '<h1>' + esc(title) + '</h1>' +
+      '<h1>' + (rawTitle ? title : esc(title)) + '</h1>' +
       (sub ? '<div class="sub">' + esc(sub) + '</div>' : '') +
       '</div>' + (actions || '') + '</div></header>';
   }
@@ -707,9 +713,9 @@ const App = (function () {
     const note = todayNote();
     const inbox = inboxItems();
 
-    let html = header('Today', longDate(today),
+    let html = header(JUNO_LOCKUP, longDate(today),
       '<button class="btn small ghost" data-action="sync" ' + (state.syncing ? 'disabled' : '') + '>' +
-      (state.syncing ? '…' : '↻') + '</button>');
+      (state.syncing ? '…' : '↻') + '</button>', true);
 
     html += '<main>' + syncLine();
 
@@ -854,7 +860,7 @@ const App = (function () {
 
     if (!items.length) {
       html += '<div class="card"><div class="empty">Nothing waiting. Capture something with ' +
-        'the + button, or share text into Life Organiser from any app.</div></div>';
+        'the + button, or share text into Juno from any app.</div></div>';
     } else {
       if (state.prefs.hasAnthropicKey) {
         html += '<button class="btn block" data-action="ai-clarify" style="margin-bottom:12px">' +

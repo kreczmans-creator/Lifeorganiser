@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The Juno mark: cream four-point star, sage dot. Drawn in the source
+     64x64 viewBox and scaled to sit inside the adaptive-icon safe zone
+     (the central ~61% survives every launcher mask). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- Compass needle: the Command Center mark. -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,28 L62,50 L54,46 L46,50 Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.55"
-        android:pathData="M54,80 L46,58 L54,62 L62,58 Z" />
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="3"
-        android:strokeAlpha="0.9"
-        android:fillColor="#00000000"
-        android:pathData="M54,26 m-28,0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0"
-        android:pivotX="54"
-        android:pivotY="54" />
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <group
+        android:scaleX="0.60"
+        android:scaleY="0.60"
+        android:pivotX="32"
+        android:pivotY="32">
+        <path
+            android:fillColor="#FAF6EC"
+            android:pathData="M32,8 l5,19 19,5 -19,5 -5,19 -5,-19 -19,-5 19,-5 Z" />
+        <path
+            android:fillColor="#8FAE87"
+            android:pathData="M51,13 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+    </group>
 </vector>

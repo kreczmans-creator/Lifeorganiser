@@ -1,37 +1,52 @@
+/*
+ * Juno design tokens.
+ * Plum #3B1A44, cream #FAF6EC, sage #617F5A — from the Juno mark.
+ * --accent drives interactive text/borders; --primary-* fill the big actions
+ * (they invert between themes: plum-on-cream by day, cream-on-plum by night);
+ * --sage marks anything done or positive, echoing the dot on the star.
+ */
 :root {
-  --bg: #f4f5f3;
-  --surface: #ffffff;
-  --surface-2: #eceee9;
-  --text: #16181a;
-  --muted: #6b7280;
-  --faint: #9aa1ab;
-  --line: #e2e5e0;
-  --accent: #1f6f5c;
-  --accent-soft: #e3f0ec;
-  --accent-text: #175a4a;
-  --warn: #b45309;
-  --warn-soft: #fdf1e3;
-  --danger: #b3261e;
-  --danger-soft: #fce9e7;
+  --bg: #faf6ec;
+  --surface: #fffdf6;
+  --surface-2: #f1ead9;
+  --text: #2b1631;
+  --muted: #6e5e74;
+  --faint: #9c8fa1;
+  --line: #e7dfcd;
+  --accent: #3b1a44;
+  --accent-soft: #ece2f0;
+  --accent-text: #4a2454;
+  --primary-bg: #3b1a44;
+  --primary-fg: #faf6ec;
+  --sage: #617f5a;
+  --sage-soft: #e4ede0;
+  --warn: #a4632b;
+  --warn-soft: #f7e9d8;
+  --danger: #a63a3a;
+  --danger-soft: #f6e3e0;
   --radius: 14px;
   --nav-h: 60px;
 }
 
 html[data-theme='dark'] {
-  --bg: #101215;
-  --surface: #1a1d21;
-  --surface-2: #23272c;
-  --text: #e8eaec;
-  --muted: #9aa3ad;
-  --faint: #6d757e;
-  --line: #2b3037;
-  --accent: #4fbfa0;
-  --accent-soft: #16302a;
-  --accent-text: #7fd8bd;
-  --warn: #e2a253;
-  --warn-soft: #33270f;
-  --danger: #f2857c;
-  --danger-soft: #3a1c1a;
+  --bg: #1d1022;
+  --surface: #2a1731;
+  --surface-2: #36203f;
+  --text: #f4eee1;
+  --muted: #b4a6b9;
+  --faint: #837389;
+  --line: #3e2947;
+  --accent: #d4b7de;
+  --accent-soft: #3a2244;
+  --accent-text: #dec8e6;
+  --primary-bg: #f4eee1;
+  --primary-fg: #331743;
+  --sage: #8fae87;
+  --sage-soft: #2c3a28;
+  --warn: #dfa867;
+  --warn-soft: #3b2c14;
+  --danger: #e58b82;
+  --danger-soft: #40201d;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -70,6 +85,12 @@ header.top h1 {
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+header.top h1 svg.mark {
+  width: 22px;
+  height: 22px;
+  margin-right: 7px;
+  vertical-align: -2px;
 }
 header.top .sub {
   color: var(--muted);
@@ -115,8 +136,8 @@ nav.bottom button.active { color: var(--accent); font-weight: 600; }
 nav.bottom button .badge {
   position: absolute;
   transform: translate(16px, -12px);
-  background: var(--accent);
-  color: #fff;
+  background: var(--primary-bg);
+  color: var(--primary-fg);
   border-radius: 9px;
   font-size: 10px;
   font-weight: 700;
@@ -149,11 +170,11 @@ nav.bottom button .badge {
 }
 
 .onething {
-  background: linear-gradient(140deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #000) 100%);
-  color: #fff;
+  background: linear-gradient(140deg, #4a2455 0%, #2c1233 100%);
+  color: #faf6ec;
   border: 0;
 }
-.onething h2 { color: rgba(255,255,255,.8); }
+.onething h2 { color: rgba(250,246,236,.75); }
 .onething .value { font-size: 19px; font-weight: 600; line-height: 1.35; }
 .onething .value.placeholder { opacity: .72; font-weight: 400; font-size: 16px; }
 
@@ -177,7 +198,7 @@ nav.bottom button .badge {
   min-height: 44px;
 }
 .btn:active { transform: scale(.985); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn.primary { background: var(--primary-bg); border-color: var(--primary-bg); color: var(--primary-fg); font-weight: 600; }
 .btn.ghost { background: transparent; }
 .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
 .btn.block { width: 100%; }
@@ -199,6 +220,7 @@ nav.bottom button .badge {
   font-weight: 500;
 }
 .chip.accent { background: var(--accent-soft); color: var(--accent-text); }
+.chip.sage { background: var(--sage-soft); color: var(--sage); }
 .chip.warn { background: var(--warn-soft); color: var(--warn); }
 .chip.danger { background: var(--danger-soft); color: var(--danger); }
 
@@ -230,8 +252,9 @@ button.check {
   padding: 0;
 }
 button.check[aria-pressed='true'] {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--sage);
+  border-color: var(--sage);
+  color: #fff;
 }
 li.task.done > span { color: var(--faint); text-decoration: line-through; }
 li.task > span, .rowitem .body { flex: 1 1 auto; min-width: 0; }
@@ -358,7 +381,7 @@ label.field .hint { display: block; font-size: 12.5px; color: var(--faint); marg
   bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px));
   z-index: 25;
   width: 56px; height: 56px; border-radius: 18px;
-  border: 0; background: var(--accent); color: #fff;
+  border: 0; background: var(--primary-bg); color: var(--primary-fg);
   font-size: 26px; line-height: 1;
   box-shadow: 0 6px 18px rgba(0,0,0,.22);
   cursor: pointer;

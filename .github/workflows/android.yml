@@ -46,14 +46,14 @@ jobs:
         run: |
           mkdir -p dist
           cp android/app/build/outputs/apk/release/app-release.apk \
-             dist/life-organiser.apk
+             dist/juno.apk
           ls -lh dist/
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: life-organiser-apk
-          path: dist/life-organiser.apk
+          name: juno-apk
+          path: dist/juno.apk
           if-no-files-found: error
 
       # A single moving release so the phone always has one link to come back
@@ -65,11 +65,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete apk-latest --yes --cleanup-tag || true
-          gh release create apk-latest dist/life-organiser.apk \
-            --title "Life Organiser — latest APK" \
+          gh release create apk-latest dist/juno.apk \
+            --title "Juno — latest APK" \
             --notes "Build ${{ github.run_number }} from \`${{ github.ref_name }}\` (${GITHUB_SHA::7}).
 
-          **Install:** open this page on your Android phone, tap \`life-organiser.apk\`, and allow installs from your browser when prompted.
+          **Install:** open this page on your Android phone, tap \`juno.apk\`, and allow installs from your browser when prompted.
 
           Updates install over the top — no need to uninstall first." \
             --prerelease
