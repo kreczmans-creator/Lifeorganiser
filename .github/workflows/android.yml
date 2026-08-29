@@ -1,0 +1,75 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+      - '_templates/**'
+      - '0*/**'
+      - 'CLAUDE.md'
+      - 'Command Center.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build release APK
+        working-directory: android
+        run: |
+          ./gradlew assembleRelease --no-daemon --stacktrace \
+            -PappVersionCode=${{ github.run_number }} \
+            -PappVersionName=1.${{ github.run_number }}
+
+      - name: Stage the APK
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk \
+             dist/life-organiser.apk
+          ls -lh dist/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-organiser-apk
+          path: dist/life-organiser.apk
+          if-no-files-found: error
+
+      # A single moving release so the phone always has one link to come back
+      # to. Re-download it to update; the signing key never changes, so it
+      # installs over the top rather than forcing an uninstall.
+      - name: Publish to the rolling release
+        if: github.ref == 'refs/heads/claude/daily-life-tracker-0u4ny9' || github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk-latest --yes --cleanup-tag || true
+          gh release create apk-latest dist/life-organiser.apk \
+            --title "Life Organiser — latest APK" \
+            --notes "Build ${{ github.run_number }} from \`${{ github.ref_name }}\` (${GITHUB_SHA::7}).
+
+          **Install:** open this page on your Android phone, tap \`life-organiser.apk\`, and allow installs from your browser when prompted.
+
+          Updates install over the top — no need to uninstall first." \
+            --prerelease

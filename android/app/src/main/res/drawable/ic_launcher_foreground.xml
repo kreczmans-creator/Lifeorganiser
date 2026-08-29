@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Compass needle: the Command Center mark. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28 L62,50 L54,46 L46,50 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M54,80 L46,58 L54,62 L62,58 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeAlpha="0.9"
+        android:fillColor="#00000000"
+        android:pathData="M54,26 m-28,0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0"
+        android:pivotX="54"
+        android:pivotY="54" />
+</vector>
