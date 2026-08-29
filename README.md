@@ -1,9 +1,20 @@
 # Life Organiser — A Claude-Powered Life System
 
 A personal life management system built from plain markdown files. It works in
-**Claude Code** (via slash commands) and in **Obsidian** (as a vault) at the
-same time — no plugins, no subscription, no lock-in. Everything is a text file
-you own.
+**Claude Code** (via slash commands), in **Obsidian** (as a vault), and on
+**Android** (as an app you install) — all at the same time, on the same files.
+No plugins, no subscription, no lock-in. Everything is a text file you own.
+
+## 📱 On your phone
+
+Install the Android app from the rolling release — open this on the handset
+and tap the APK:
+
+**[github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest](https://github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest)**
+
+Capture from any app via the share sheet, tick habits and tasks, edit notes,
+and sync back to this repo with one tap — no git commands on the phone. Setup
+and details in [`android/README.md`](android/README.md).
 
 ## What it does
 
@@ -71,6 +82,18 @@ _templates/         ← the blueprints Claude uses to create new notes
    serves none, question it.
 5. **The system maintains itself.** You capture and reflect; Claude files,
    links, and rebuilds the dashboard.
+
+## Three ways in, one set of files
+
+| Where | Good for |
+|---|---|
+| **Android app** | Capture on the move, tick habits, check today, quick edits |
+| **Claude Code** | The thinking work: `/clarify`, `/review`, restructuring, bulk edits |
+| **Obsidian** | Long-form writing, graph view, desktop reading |
+
+They all read and write the same markdown, so nothing has to be kept in step
+by hand. The app syncs over the GitHub API; Obsidian and Claude Code work on
+your clone.
 
 Everything here is yours. Edit any file, rename any section, delete what you
 don't use — Claude reads `CLAUDE.md` and adapts.
