@@ -295,11 +295,29 @@ class GitHubSync(private val prefs: Prefs, private val vault: VaultStore) {
     fun testConnection(): JSONObject {
         if (!prefs.isSyncConfigured()) throw SyncError("Fill in token, owner and repo first.")
         val repoJson = JSONObject(request("GET", "/repos/${prefs.owner}/${prefs.repo}"))
-        val head = headCommitSha()
+
+        // A branch that doesn't exist (e.g. the untouched "main" default in a
+        // repo whose default branch is named differently) is self-corrected to
+        // the repo's real default rather than left as a confusing 404.
+        var correctedFrom: String? = null
+        val head = try {
+            headCommitSha()
+        } catch (e: SyncError) {
+            val default = repoJson.optString("default_branch")
+            if (default.isNotBlank() && default != prefs.branch) {
+                correctedFrom = prefs.branch
+                prefs.branch = default
+                headCommitSha()
+            } else {
+                throw e
+            }
+        }
+
         return JSONObject()
             .put("repo", repoJson.optString("full_name"))
             .put("private", repoJson.optBoolean("private"))
             .put("branch", prefs.branch)
+            .put("correctedFrom", correctedFrom ?: JSONObject.NULL)
             .put("head", head.take(7))
     }
 }

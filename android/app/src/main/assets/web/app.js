@@ -1452,7 +1452,16 @@ const App = (function () {
         collectSettings();
         toast('Checking…');
         Bridge.testConnection().then(function (info) {
-          toast('Connected to ' + info.repo + ' @' + info.head);
+          // The Kotlin side may have corrected a non-existent branch to the
+          // repo's default; refresh the form so the fields show the truth.
+          state.prefs = Bridge.getPrefs();
+          if (state.route === 'settings') render();
+          if (info.correctedFrom) {
+            toast('Connected to ' + info.repo + ' — branch set to ' + info.branch +
+              ' (' + info.correctedFrom + ' doesn’t exist)');
+          } else {
+            toast('Connected to ' + info.repo + ' (' + info.branch + ') @' + info.head);
+          }
         }).catch(function (err) { toast(err.message, true); });
         return;
 
