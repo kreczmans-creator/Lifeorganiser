@@ -1,0 +1,6 @@
+# Obsidian workspace state (per-device, not part of the system)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/
+.DS_Store
