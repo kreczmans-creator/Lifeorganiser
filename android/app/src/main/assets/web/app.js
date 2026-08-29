@@ -965,9 +965,9 @@ const App = (function () {
       '<main>' +
       '<div class="card"><h2>GitHub sync</h2>' +
       '<label class="field"><span class="lab">Owner</span>' +
-      '<input type="text" id="s-owner" value="' + esc(p.owner || '') + '" placeholder="your-username" autocapitalize="none"></label>' +
+      '<input type="text" id="s-owner" value="' + esc(p.owner || '') + '" placeholder="e.g. octocat" autocapitalize="none"></label>' +
       '<label class="field"><span class="lab">Repository</span>' +
-      '<input type="text" id="s-repo" value="' + esc(p.repo || '') + '" placeholder="lifeorganiser" autocapitalize="none"></label>' +
+      '<input type="text" id="s-repo" value="' + esc(p.repo || '') + '" placeholder="e.g. lifeorganiser" autocapitalize="none"></label>' +
       '<label class="field"><span class="lab">Branch</span>' +
       '<input type="text" id="s-branch" value="' + esc(p.branch || 'main') + '" autocapitalize="none"></label>' +
       '<label class="field"><span class="lab">Personal access token</span>' +
