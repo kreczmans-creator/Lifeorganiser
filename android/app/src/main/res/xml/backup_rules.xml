@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Only the vault is backed up. Listing an include means everything else
+     (tokens in shared prefs included) stays out of backups. -->
 <full-backup-content>
-    <include domain="file" path="vault/" />
-    <exclude domain="sharedpref" path="lifeorganiser_secure.xml" />
+    <include domain="file" path="vault" />
 </full-backup-content>
