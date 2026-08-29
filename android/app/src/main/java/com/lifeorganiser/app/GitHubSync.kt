@@ -195,12 +195,15 @@ class GitHubSync(private val prefs: Prefs, private val vault: VaultStore) {
         prefs.saveSyncState(newState)
         prefs.lastSyncAt = Clock.now()
 
+        val conflictArray = JSONArray()
+        conflictFiles.forEach { conflictArray.put(it) }
+
         return JSONObject().apply {
             put("pulled", toPull.size)
             put("pushed", toPush.size)
             put("deletedLocally", toDeleteLocally.size)
             put("deletedRemotely", toDeleteRemotely.size)
-            put("conflicts", JSONArray(conflictFiles as List<*>))
+            put("conflicts", conflictArray)
             put("commit", pushedCommit ?: JSONObject.NULL)
             put("lastSyncAt", prefs.lastSyncAt)
         }

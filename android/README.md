@@ -47,11 +47,28 @@ scoped to this one repo and nothing else.
 Optionally add an **Anthropic API key** to unlock "Clarify all with Claude",
 which files your whole Inbox in one go. Everything else works without it.
 
+### Google Calendar
+
+The Today screen can pull your agenda in, read-only, with no Google sign-in:
+
+1. Open [Google Calendar settings](https://calendar.google.com/calendar/r/settings)
+   on the web, pick your calendar under *Settings for my calendars*.
+2. Scroll to *Integrate calendar* and copy the **Secret address in iCal
+   format** (the `…/basic.ics` URL).
+3. Paste it into **Settings → Google Calendar** in the app — one URL per line
+   if you follow several calendars.
+
+Today's and tomorrow's events appear on the Today screen (recurring events,
+all-day events and timezones are handled), and today's agenda is written into
+the daily note's **📅 Calendar** section, so the vault — and any Claude Code
+session — sees your day too. Treat the secret address like a password; anyone
+holding it can read that calendar. Nothing is ever written back to Google.
+
 ## What you can do on the phone
 
 | | |
 |---|---|
-| **Today** | One Thing, today's tasks, habit ticks with streaks, due & overdue across the whole vault, project statuses, follow-ups and birthdays |
+| **Today** | One Thing, your Google Calendar agenda, today's tasks, habit ticks with streaks, due & overdue across the whole vault, project statuses, follow-ups and birthdays |
 | **Capture** | The `+` button anywhere, a home-screen shortcut, or **share text from any app** straight into the Inbox |
 | **Inbox** | File each capture into a project, goal, area, person, knowledge note, an existing note's task list, or the archive |
 | **Notes** | Browse every section, open any note, tap checkboxes, edit raw markdown, follow `[[wikilinks]]` |

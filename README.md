@@ -13,8 +13,9 @@ and tap the APK:
 **[github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest](https://github.com/kreczmans-creator/lifeorganiser/releases/tag/apk-latest)**
 
 Capture from any app via the share sheet, tick habits and tasks, edit notes,
-and sync back to this repo with one tap — no git commands on the phone. Setup
-and details in [`android/README.md`](android/README.md).
+pull in your Google Calendar agenda, and sync back to this repo with one tap —
+no git commands on the phone. Setup and details in
+[`android/README.md`](android/README.md).
 
 ## What it does
 

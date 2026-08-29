@@ -17,8 +17,9 @@ class VaultBridge(
     private val prefs: Prefs,
 ) {
     private val worker = Executors.newSingleThreadExecutor()
-    private val sync = GitHubSync(prefs, vault)
+    private val github = GitHubSync(prefs, vault)
     private val assist = ClaudeAssist(prefs)
+    private val calendar = CalendarFetch(prefs)
 
     var pendingRoute: String? = null
     var pendingShare: String? = null
@@ -47,7 +48,11 @@ class VaultBridge(
     // ---- vault ------------------------------------------------------------
 
     @JavascriptInterface
-    fun listFiles(): String = JSONArray(vault.list() as List<*>).toString()
+    fun listFiles(): String {
+        val array = JSONArray()
+        vault.list().forEach { array.put(it) }
+        return array.toString()
+    }
 
     @JavascriptInterface
     fun readFile(path: String): String? = vault.read(path)
@@ -102,14 +107,17 @@ class VaultBridge(
     // ---- network ----------------------------------------------------------
 
     @JavascriptInterface
-    fun sync(id: String) = background(id) { sync.sync() }
+    fun sync(id: String) = background(id) { github.sync() }
 
     @JavascriptInterface
-    fun testConnection(id: String) = background(id) { sync.testConnection() }
+    fun testConnection(id: String) = background(id) { github.testConnection() }
 
     @JavascriptInterface
     fun aiAsk(id: String, system: String, user: String) =
         background(id) { assist.ask(system, user) }
+
+    @JavascriptInterface
+    fun fetchCalendars(id: String) = background(id) { calendar.fetchAll() }
 
     // ---- app plumbing -----------------------------------------------------
 

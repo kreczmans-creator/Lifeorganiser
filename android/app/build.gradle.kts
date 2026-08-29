@@ -3,22 +3,31 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// The vault markdown at the repo root is the single source of truth. Copy it
-// into assets at build time so a fresh install has a working vault before the
-// user has configured GitHub sync.
-val seedVault = tasks.register<Sync>("seedVault") {
+// The vault markdown at the repo root is the single source of truth. It is
+// copied into the asset tree at build time so a fresh install has a working
+// vault before the user has configured GitHub sync.
+//
+// This deliberately declares no task outputs. Producing into a directory that
+// the asset and lint tasks read would oblige every one of those consumers to
+// declare a dependency on it, and missing one fails the build.
+val seedVault = tasks.register("seedVault") {
     val repoRoot = rootProject.projectDir.parentFile
-    into(layout.buildDirectory.dir("generated/seed/seed"))
-    from(repoRoot) {
-        include("CLAUDE.md", "README.md", "Command Center.md")
-        include(
-            "00-Inbox/**", "01-Values/**", "02-Goals/**", "03-Projects/**",
-            "04-Areas/**", "05-Knowledge/**", "06-People/**", "07-Journal/**",
-            "08-Archive/**", "_templates/**",
-        )
+    val destination = file("src/main/assets/seed")
+    doLast {
+        if (!repoRoot.isDirectory) return@doLast
+        destination.deleteRecursively()
+        project.copy {
+            from(repoRoot) {
+                include("CLAUDE.md", "README.md", "Command Center.md")
+                include(
+                    "00-Inbox/**", "01-Values/**", "02-Goals/**", "03-Projects/**",
+                    "04-Areas/**", "05-Knowledge/**", "06-People/**", "07-Journal/**",
+                    "08-Archive/**", "_templates/**",
+                )
+            }
+            into(destination)
+        }
     }
-    // Never fail the build just because the vault moved.
-    onlyIf { repoRoot.isDirectory }
 }
 
 android {
@@ -32,8 +41,6 @@ android {
         versionCode = (project.findProperty("appVersionCode") as String?)?.toInt() ?: 1
         versionName = (project.findProperty("appVersionName") as String?) ?: "1.0"
     }
-
-    sourceSets["main"].assets.srcDir(layout.buildDirectory.dir("generated/seed"))
 
     // A throwaway key so every build installs as an upgrade instead of forcing
     // an uninstall. It signs a personal sideloaded app and protects nothing.
@@ -70,6 +77,8 @@ android {
     }
 }
 
-tasks.withType<com.android.build.gradle.tasks.MergeSourceSetFolders>().configureEach {
+// preBuild is the root of the Android task graph, so the seed is in place
+// before assets are merged — and it avoids depending on AGP task classes.
+tasks.named("preBuild") {
     dependsOn(seedVault)
 }

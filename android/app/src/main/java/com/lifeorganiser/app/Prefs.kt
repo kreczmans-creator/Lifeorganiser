@@ -40,6 +40,11 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean("auto_sync", true)
         set(v) = prefs.edit().putBoolean("auto_sync", v).apply()
 
+    /** Newline-separated iCal feed URLs (e.g. Google Calendar secret addresses). */
+    var icalUrls: String
+        get() = prefs.getString("ical_urls", "") ?: ""
+        set(v) = prefs.edit().putString("ical_urls", v).apply()
+
     var lastSyncAt: String
         get() = prefs.getString("last_sync_at", "") ?: ""
         set(v) = prefs.edit().putString("last_sync_at", v).apply()
@@ -75,6 +80,7 @@ class Prefs(context: Context) {
         put("branch", branch)
         put("model", model)
         put("autoSync", autoSync)
+        put("icalUrls", icalUrls)
         put("lastSyncAt", lastSyncAt)
         put("syncConfigured", isSyncConfigured())
     }
@@ -87,5 +93,6 @@ class Prefs(context: Context) {
         if (json.has("branch")) branch = json.optString("branch").ifBlank { "main" }
         if (json.has("model")) model = json.optString("model").ifBlank { "claude-sonnet-5" }
         if (json.has("autoSync")) autoSync = json.optBoolean("autoSync", true)
+        if (json.has("icalUrls")) icalUrls = json.optString("icalUrls")
     }
 }

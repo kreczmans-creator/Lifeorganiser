@@ -53,6 +53,7 @@ const Bridge = (function () {
       sync: function () { return asyncCall('sync'); },
       testConnection: function () { return asyncCall('testConnection'); },
       aiAsk: function (system, user) { return asyncCall('aiAsk', [system, user]); },
+      fetchCalendars: function () { return asyncCall('fetchCalendars'); },
     };
   }
 
@@ -185,13 +186,45 @@ const Bridge = (function () {
     aiAsk: function () {
       return Promise.reject(new Error('AI actions need the Android app and an API key.'));
     },
+    fetchCalendars: function () {
+      // A realistic sample feed pinned to "today" so the UI can be exercised
+      // in a desktop browser: timed events, an all-day event, a weekly
+      // recurrence and a UTC time.
+      const t = todayStr().replace(/-/g, '');
+      const tomorrow = (function () {
+        const x = new Date(); x.setDate(x.getDate() + 1);
+        return x.getFullYear() + pad(x.getMonth() + 1) + pad(x.getDate());
+      })();
+      const ics = [
+        'BEGIN:VCALENDAR',
+        'BEGIN:VEVENT',
+        'UID:demo-1', 'SUMMARY:Team standup',
+        'DTSTART:' + t + 'T093000', 'DTEND:' + t + 'T095000',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'UID:demo-2', 'SUMMARY:Dentist', 'LOCATION:High Street practice',
+        'DTSTART:' + t + 'T140000', 'DTEND:' + t + 'T143000',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'UID:demo-3', 'SUMMARY:Bin day',
+        'DTSTART;VALUE=DATE:' + tomorrow,
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'UID:demo-4', 'SUMMARY:Five-a-side',
+        'DTSTART:' + t + 'T180000', 'DTEND:' + t + 'T190000',
+        'RRULE:FREQ=WEEKLY;INTERVAL=1',
+        'END:VEVENT',
+        'END:VCALENDAR',
+      ].join('\r\n');
+      return fakeAsync([{ url: 'https://example.com/basic.ics', ok: true, body: ics }], 350);
+    },
   };
 
   function defaults() {
     return {
       hasToken: false, hasAnthropicKey: false, owner: '', repo: '',
       branch: 'main', model: 'claude-sonnet-5', autoSync: true,
-      lastSyncAt: '', syncConfigured: false,
+      lastSyncAt: '', syncConfigured: false, icalUrls: '',
     };
   }
 })();

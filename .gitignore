@@ -11,3 +11,4 @@ android/build/
 android/app/build/
 android/local.properties
 android/.kotlin/
+android/app/src/main/assets/seed/

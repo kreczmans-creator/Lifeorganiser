@@ -39,6 +39,7 @@ const App = (function () {
     syncing: false,
     dirty: false,
     prefill: null,
+    calendar: { events: [], fetchedAt: null, error: null },
   };
 
   // ---- utilities --------------------------------------------------------
@@ -453,6 +454,109 @@ const App = (function () {
     return target;
   }
 
+  // ---- calendar ----------------------------------------------------------
+
+  const CAL_CACHE = 'lifeorganiser.calcache';
+
+  function calendarConfigured() {
+    return /https:\/\//.test(state.prefs.icalUrls || '');
+  }
+
+  function loadCalendarCache() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CAL_CACHE) || 'null');
+      if (!raw) return;
+      state.calendar = {
+        fetchedAt: raw.fetchedAt,
+        error: null,
+        events: (raw.events || []).map(function (e) {
+          return {
+            title: e.title, location: e.location, allDay: e.allDay,
+            start: new Date(e.start), end: e.end ? new Date(e.end) : null,
+          };
+        }),
+      };
+    } catch (e) { /* cache is a convenience only */ }
+  }
+
+  function saveCalendarCache() {
+    try {
+      localStorage.setItem(CAL_CACHE, JSON.stringify({
+        fetchedAt: state.calendar.fetchedAt,
+        events: state.calendar.events.map(function (e) {
+          return {
+            title: e.title, location: e.location, allDay: e.allDay,
+            start: e.start.getTime(), end: e.end ? e.end.getTime() : null,
+          };
+        }),
+      }));
+    } catch (e) { /* ditto */ }
+  }
+
+  function eventsOn(dateStr) {
+    return state.calendar.events.filter(function (e) {
+      return ICS.dayKey(e.start) === dateStr;
+    });
+  }
+
+  /** Mirror today's agenda into the daily note so the vault sees it too. */
+  function writeAgendaToDailyNote() {
+    const today = Bridge.today();
+    const note = read(dailyPath(today));
+    if (note === null) return;
+
+    const events = eventsOn(today);
+    if (!events.length) return;
+
+    const lines = events.map(function (e) {
+      if (e.allDay) return '- ' + e.title + ' (all day)';
+      const span = ICS.fmtTime(e.start) + (e.end ? '–' + ICS.fmtTime(e.end) : '');
+      return '- ' + span + ' — ' + e.title + (e.location ? ' @ ' + e.location : '');
+    }).join('\n');
+
+    // setSectionBody creates the section at the end of the note if missing.
+    const existing = MD.getSection(note, 'calendar');
+    if (existing === lines) return;
+    save(dailyPath(today), MD.setSectionBody(note, '📅 Calendar', lines));
+  }
+
+  function refreshCalendar(silent) {
+    if (!calendarConfigured()) return Promise.resolve();
+
+    return Bridge.fetchCalendars().then(function (results) {
+      const windowStart = new Date();
+      windowStart.setHours(0, 0, 0, 0);
+      windowStart.setDate(windowStart.getDate() - 1);
+      const windowEnd = new Date(windowStart);
+      windowEnd.setDate(windowEnd.getDate() + 15);
+
+      const events = [];
+      const failures = [];
+      (results || []).forEach(function (feed) {
+        if (!feed.ok) { failures.push(feed.error || 'fetch failed'); return; }
+        try {
+          ICS.parse(feed.body, windowStart, windowEnd).forEach(function (e) { events.push(e); });
+        } catch (e) {
+          failures.push('could not parse a feed');
+        }
+      });
+      events.sort(function (a, b) { return a.start - b.start; });
+
+      state.calendar = {
+        events: events,
+        fetchedAt: Bridge.now(),
+        error: failures.length ? failures[0] : null,
+      };
+      saveCalendarCache();
+      writeAgendaToDailyNote();
+      render();
+      if (!silent && failures.length) toast('Calendar: ' + failures[0], true);
+    }).catch(function (err) {
+      state.calendar.error = err.message;
+      if (!silent) toast('Calendar: ' + err.message, true);
+    });
+  }
+
   // ---- sync -------------------------------------------------------------
 
   function doSync(silent) {
@@ -588,6 +692,16 @@ const App = (function () {
       '<span>' + esc(MD.plain(task.text)) + dueHtml + source + '</span></li>';
   }
 
+  function calRow(e) {
+    const when = e.allDay
+      ? 'All day'
+      : ICS.fmtTime(e.start) + (e.end ? '–' + ICS.fmtTime(e.end) : '');
+    return '<div class="rowitem" style="cursor:default">' +
+      '<span>📅</span><div class="body"><div class="t">' + esc(e.title) + '</div>' +
+      '<div class="m">' + esc(when) + (e.location ? ' · ' + esc(e.location) : '') +
+      '</div></div></div>';
+  }
+
   function viewToday() {
     const today = Bridge.today();
     const note = todayNote();
@@ -639,6 +753,25 @@ const App = (function () {
         });
         html += '</div>';
       }
+    }
+
+    if (calendarConfigured() || state.calendar.events.length) {
+      const todayEvents = eventsOn(today);
+      const tomorrowEvents = eventsOn(shiftDays(today, 1));
+      html += '<div class="card"><h2>Calendar' +
+        (state.calendar.error ? '<span class="chip warn">feed error</span>' : '') + '</h2>';
+      if (!todayEvents.length && !tomorrowEvents.length) {
+        html += '<div class="empty">' +
+          (state.calendar.fetchedAt ? 'Nothing scheduled today or tomorrow.' :
+           'Fetching your calendar\u2026') + '</div>';
+      } else {
+        todayEvents.forEach(function (e) { html += calRow(e); });
+        if (tomorrowEvents.length) {
+          html += '<div class="src" style="padding:8px 0 2px">Tomorrow</div>';
+          tomorrowEvents.forEach(function (e) { html += calRow(e); });
+        }
+      }
+      html += '</div>';
     }
 
     const due = dueTasks(7).filter(function (t) {
@@ -850,6 +983,15 @@ const App = (function () {
       '<button class="btn" data-action="test-connection">Test</button>' +
       '<button class="btn primary" data-action="save-settings">Save</button>' +
       '</div></div>' +
+
+      '<div class="card"><h2>Google Calendar <span class="chip">Optional</span></h2>' +
+      '<label class="field"><span class="lab">iCal feed URLs (one per line)</span>' +
+      '<textarea id="s-ical" rows="3" style="min-height:70px" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" autocapitalize="none">' +
+      esc(p.icalUrls || '') + '</textarea>' +
+      '<span class="hint">Google Calendar → Settings → your calendar → ' +
+      '“Secret address in iCal format”. Read-only: the app never writes to ' +
+      'your calendar. Today\'s agenda also lands in the daily note.</span></label>' +
+      '<button class="btn block" data-action="save-settings">Save</button></div>' +
 
       '<div class="card"><h2>Claude assistance <span class="chip">Optional</span></h2>' +
       '<label class="field"><span class="lab">Anthropic API key</span>' +
@@ -1165,6 +1307,7 @@ const App = (function () {
 
       case 'sync':
         doSync(false);
+        refreshCalendar(true);
         return;
 
       case 'toggle': {
@@ -1186,6 +1329,7 @@ const App = (function () {
 
       case 'start-day':
         startDay();
+        writeAgendaToDailyNote();
         reload();
         render();
         toast('Today is ready');
@@ -1317,6 +1461,7 @@ const App = (function () {
         reload();
         render();
         toast('Saved');
+        refreshCalendar(true);
         return;
     }
   }
@@ -1327,6 +1472,7 @@ const App = (function () {
       return node ? node.value.trim() : undefined;
     };
     const payload = {};
+    const ical = value('s-ical');     if (ical !== undefined) payload.icalUrls = ical;
     const owner = value('s-owner');   if (owner !== undefined) payload.owner = owner;
     const repo = value('s-repo');     if (repo !== undefined) payload.repo = repo;
     const branch = value('s-branch'); if (branch !== undefined) payload.branch = branch || 'main';
@@ -1367,6 +1513,7 @@ const App = (function () {
   function init() {
     applyTheme();
     reload();
+    loadCalendarCache();
 
     document.addEventListener('click', function (e) {
       const link = e.target.closest('a.wl');
@@ -1396,6 +1543,7 @@ const App = (function () {
     if (!handleLaunchIntent()) render();
 
     if (state.prefs.autoSync && state.prefs.syncConfigured) doSync(true);
+    refreshCalendar(true);
   }
 
   return { init: init, go: go, state: state };
